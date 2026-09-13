@@ -32,7 +32,7 @@ You get the following data that is produced by an imaginary forest conservation 
 
 ### a) 
 
-> Implement the optimization and compute the optimal allocation.
+> Implement the optimization as a mixed integer linear program and compute the optimal allocation.
 
 ### b) 
 
@@ -50,10 +50,10 @@ By changing the sliders below you can change the data generating process and see
 """
 
 # ╔═╡ e681e38e-18cb-42c0-9260-dd3df287e86f
-@bindname N PlutoUI.Slider(5:100; default=15, show_value=true)
+@bindname N PlutoUI.Slider(5:100; default=25, show_value=true)
 
 # ╔═╡ a86a8816-8352-44bf-a478-0b77cbec5327
-@bindname ρ PlutoUI.Slider(-1:.01:1; default=0, show_value=true)
+@bindname ρ PlutoUI.Slider(-1:.01:1; default=0.36, show_value=true)
 
 # ╔═╡ 77dcd29a-e065-447f-8dc6-c0da0bbd1442
 @bindname σ_EB PlutoUI.Slider(1:.5:50; default=35, show_value=true)
@@ -69,17 +69,20 @@ begin
 		ρ*σ_bid*σ_EB 	σ_EB^2
 	]
 	# Sample N samples from multivariate normal distribution
-	nmv_sample = rand(MvNormal([50, 100], Σ), N)
+	nmv_sample = rand(
+		MvNormal([50, 100], Σ), 
+		N
+	)
 	# Save the sample as a data frame
 	data = DataFrame(
 		Dict(
 			"bids" => vec(nmv_sample[1,:]),
 			"EB" => vec(nmv_sample[2,:])	
 		)
-	);
+	)
 	# Budget
-	B = 500;
-end
+	B = 500
+end;
 
 # ╔═╡ 50916919-c269-4d6d-96c8-53fc5093556a
 md"""
@@ -150,7 +153,7 @@ begin
 	allocation = solve_allocation(data, B)
 	# Convert the decision vector to a bit vector
 	data[!, "milp_allocation"] = allocation .≥ 0.5
-end
+end;
 
 # ╔═╡ 1d0e40a3-49c5-4cae-8bec-ad071ee2f44f
 begin
@@ -194,28 +197,26 @@ begin
 
 	# Compute allocation by choosing highest environmental benefit
 	sort!(data, [:EB], rev=true)
-	data[!, "EB_allocation"] = cumsum(data[!,:bids]) .≤ B;
-end
+	data[!, "EB_allocation"] = cumsum(data[!,:bids]) .≤ B
+end;
 
 # ╔═╡ 4c1de331-02e6-4f50-b895-7570e388c7d4
 begin
-	milp_cost = round(data[!,:milp_allocation]'*data[!,:bids]; digits=2);
-	milp_eb = round(data[!,:milp_allocation]'*data[!,:EB]; digits=2);
+	milp_cost = round(data[!,:milp_allocation]'*data[!,:bids]; digits=2)
+	milp_eb = round(data[!,:milp_allocation]'*data[!,:EB]; digits=2)
 
-	cost_cost = round(data[!,:bid_allocation]'*data[!,:bids]; digits=2);
-	cost_eb = round(data[!,:bid_allocation]'*data[!,:EB]; digits=2);
+	cost_cost = round(data[!,:bid_allocation]'*data[!,:bids]; digits=2)
+	cost_eb = round(data[!,:bid_allocation]'*data[!,:EB]; digits=2)
+	
+	eb_cost = round(data[!,:EB_allocation]'*data[!,:bids]; digits=2)
+	eb_eb = round(data[!,:EB_allocation]'*data[!,:EB]; digits=2)
 
-	eb_cost = round(data[!,:EB_allocation]'*data[!,:bids]; digits=2);
-	eb_eb = round(data[!,:EB_allocation]'*data[!,:EB]; digits=2);
-
-	milp_ratio = round((data[!,:milp_allocation]'*data[!,:bids])/(data[!,:milp_allocation]'*data[!,:EB]); digits=3);
-	cost_ratio = round((data[!,:bid_allocation]'*data[!,:bids])/(data[!,:bid_allocation]'*data[!,:EB]); digits=3);
-	eb_ratio = round((data[!,:EB_allocation]'*data[!,:bids])/(data[!,:EB_allocation]'*data[!,:EB]); digits=3);
-end
+	milp_ratio = round((data[!,:milp_allocation]'*data[!,:bids])/(data[!,:milp_allocation]'*data[!,:EB]); digits=3)
+	cost_ratio = round((data[!,:bid_allocation]'*data[!,:bids])/(data[!,:bid_allocation]'*data[!,:EB]); digits=3)
+	eb_ratio = round((data[!,:EB_allocation]'*data[!,:bids])/(data[!,:EB_allocation]'*data[!,:EB]); digits=3)
+end;
 
 # ╔═╡ 4d8f9c18-a16c-4df6-9ba5-8af89f41ca34
-# Similarly for the other two methods with their respective decision vectors, lowest bid allocation achieves an environmental benefit of $(round(data[!,:bid_allocation]'*data[!,:EB]; digits=2)) with the cost of $(round(data[!,:bid_allocation]'*data[!,:bids]; digits=2))€ and choosing highest environmental benefits achieves $(round(data[!,:EB_allocation]'*data[!,:EB]; digits=2)) environmental benefit with a cost of $(round(data[!,:EB_allocation]'*data[!,:bids]; digits=2))€.
-
 md"""
 ### d)
 
@@ -233,7 +234,7 @@ For the optimization this yields a value of $(milp_ratio). All of the values are
 | Lowest cost| $(cost_cost) | $(cost_eb) | $(cost_ratio) |
 | Highest EB| $(eb_cost) | $(eb_eb) | $(eb_ratio) |
 
-To see how each of the decision rules differs, we can still plot each of the choices. The plot below shows how the optimization chooses each of the bids by taking into account both aspects, while the simpler rules, by definition, only takes into account one of the variables. The optimization produces in many cases more efficient choices in the sense of €/EB, so for each Euro spent the auctioneer is able to achieve more environmental benefits.
+To see how each of the decision rules differs, we can still plot each of the choices. The plot below shows how the optimization chooses each of the bids by taking into account both aspects, while the simpler rules, by definition, only takes into account one of the variables. The optimization produces in many cases more efficient choices in the sense of €/EB, so for each Euro spent the auctioneer is able to achieve more environmental benefits. In some cases, choosing highest environmental benefits first can achieve higher values of €/EB, but by not being able to choose as many plots to conserve the scheme ends up having unused budget.
 """
 
 # ╔═╡ 58232494-4eb4-48c8-9070-e22004f6dde5
@@ -323,37 +324,6 @@ begin
 	axislegend(position=:rb)
 	
 	all_f
-end
-
-# ╔═╡ 22b9bfb8-7f8a-496c-9876-606b93f63c31
-function solve_allocation_sp(X, B)
-    N = size(X, 1)
-
-    model = Model(HiGHS.Optimizer)
-
-    @variable(model, x[1:N], Bin)
-    @objective(model, Max, X[!, :EB]' * x)
-    @constraint(model, budget, X[!, :bids]' * x <= B)
-
-    optimize!(model)
-
-    if !is_solved_and_feasible(model)
-        @warn "The model wasn't solved correctly."
-        return
-    end
-
-    x_opt = value.(x)
-
-    # Fix binaries at their optimal values and turn problem into an LP
-    undo = fix_discrete_variables(model)
-
-    optimize!(model)
-
-    λ = shadow_price(budget)
-
-    undo()
-
-    return x_opt, λ
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2465,6 +2435,5 @@ uuid = "23338594-aafe-5451-b93e-139f81909106"
 # ╟─4d8f9c18-a16c-4df6-9ba5-8af89f41ca34
 # ╟─58232494-4eb4-48c8-9070-e22004f6dde5
 # ╟─f95311ef-45df-4281-9bc5-b18e1b8fc94c
-# ╠═22b9bfb8-7f8a-496c-9876-606b93f63c31
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
