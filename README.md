@@ -7,4 +7,7 @@ Contains simple example of choosing bids from conservation auction while satisfy
 
 Extending the first exercise to take into account some logistics costs incurring at a field auction for phosphorus load reduction.
 
-<img width="400" alt="Map of the imaginary auction site." src="L3341E.png">
+<figure>
+  <img width="400" alt="Map of the imaginary auction site." src="L3341E.png">
+  <figcaption> Map of the imaginary auction site. </figcaption>
+</figure>
