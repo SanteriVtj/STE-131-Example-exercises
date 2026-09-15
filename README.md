@@ -1,4 +1,4 @@
-# Example exercises for Management Science &ndash; Quantitative Analyses to Decision Making
+# Example exercises for Management Science&ndash;Quantitative Analyses to Decision Making
 ## Exercise 1.
 
 Contains simple example of choosing bids from conservation auction while satisfying the budget constraint.
