@@ -11,3 +11,5 @@ Extending the first exercise to take into account some logistics costs incurring
   <img width="400" alt="Map of the imaginary auction site." src="L3341E.png">
   <figcaption> Map of the imaginary auction site. </figcaption>
 </figure>
+
+The exercise notebooks can be accessed through [https://santerivtj.github.io/STE-131-Example-exercises/](https://santerivtj.github.io/STE-131-Example-exercises/).
