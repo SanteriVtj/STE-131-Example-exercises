@@ -42,6 +42,17 @@ begin
 	Random.seed!(123)
 end
 
+# ╔═╡ 5cfc2756-630d-4522-b9c7-e6840d8463fe
+begin
+	(
+		notebook_dir = @__DIR__,
+		files_here = readdir(@__DIR__),
+		fields_file_exists = isfile(
+			joinpath(@__DIR__, "data", "auction_fields.gpkg")
+		),
+	)
+end
+
 # ╔═╡ 300bf605-8503-4f0e-86c0-9616c7c863fe
 TableOfContents()
 
@@ -4509,6 +4520,7 @@ uuid = "23338594-aafe-5451-b93e-139f81909106"
 
 # ╔═╡ Cell order:
 # ╠═bf822e2a-f5a1-49f6-9a3d-2a326e85facd
+# ╠═5cfc2756-630d-4522-b9c7-e6840d8463fe
 # ╟─3a979d09-3d6d-4398-85a2-c380f70a170d
 # ╟─300bf605-8503-4f0e-86c0-9616c7c863fe
 # ╟─b2a3713d-e71f-405a-b84d-83b66a703ffc
