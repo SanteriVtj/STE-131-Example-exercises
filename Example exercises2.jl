@@ -75,14 +75,14 @@ where ``\ell`` corresponds to `spatial_correlation_range` and ``d_{ij}`` denotes
 
 # ╔═╡ 59e6d996-3a62-4b02-8774-be424307de15
 @bindname ρₛ PlutoUI.Slider(
-	0:.01:1,
+	-1:.01:1,
 	default = .5,
 	show_value=true
 )
 
 # ╔═╡ b6a06a94-b6fe-45d3-9d1d-3a7fbc8a90bc
 @bindname ρₗ PlutoUI.Slider(
-	0:.01:1,
+	-1:.01:1,
 	default = .25,
 	show_value=true
 )
@@ -327,7 +327,7 @@ begin
 		)
 	end
 
-	map = ArchGDAL.read("L3341E.png")
+	map = ArchGDAL.read(joinpath(@__DIR__, "L3341E.png"))
 	gt = ArchGDAL.getgeotransform(map)
 
 	x0 = gt[1]
@@ -353,7 +353,7 @@ begin
     map_rotated = map_rotated = reverse(permutedims(map_small), dims = 2)
 
 	fields_raw = GeoDataFrames.read(
-	    "auction_fields.gpkg";
+	    joinpath(@__DIR__, "auction_fields.gpkg");
 	    layer = "maatalousmaa",
 	)
 
@@ -364,24 +364,23 @@ begin
     
     fields_map = fields_raw[inside, :]
 
-	map_ds = ArchGDAL.read("L3341E.png")
 
-	map_gt = ArchGDAL.getgeotransform(map_ds)
+	map_gt = ArchGDAL.getgeotransform(map)
 
 	map_x0 = map_gt[1]
 	map_dx = map_gt[2]
 	map_y0 = map_gt[4]
 	map_dy = map_gt[6]
 
-	map_nx = ArchGDAL.width(map_ds)
-	map_ny = ArchGDAL.height(map_ds)
+	map_nx = ArchGDAL.width(map)
+	map_ny = ArchGDAL.height(map)
 
 	map_xmin = map_x0
 	map_xmax = map_x0 + map_nx * map_dx
 	map_ymax = map_y0
 	map_ymin = map_y0 + map_ny * map_dy
 
-	map_image_raw = ArchGDAL.imread(map_ds)
+	map_image_raw = ArchGDAL.imread(map)
 
 	map_step = 2
 
@@ -416,22 +415,22 @@ begin
 	fields_clean.id = 1:nrow(fields_clean)
 
 	lakes_raw = GeoDataFrames.read(
-		"auction_lakes.gpkg";
+		joinpath(@__DIR__, "auction_lakes.gpkg");
 		layer = "jarvi",
 	)
 
 	rivers_raw = GeoDataFrames.read(
-		"auction_rivers.gpkg";
+		joinpath(@__DIR__, "auction_rivers.gpkg");
 		layer = "virtavesialue",
 	)
 
 	ditches_raw = GeoDataFrames.read(
-		"auction_ditches.gpkg";
+		joinpath(@__DIR__, "auction_ditches.gpkg");
 		layer = "virtavesikapea",
 	)
 
 	sea_raw = GeoDataFrames.read(
-		"auction_sea.gpkg";
+		joinpath(@__DIR__, "auction_sea.gpkg");
 		layer = "meri",
 	)
 
